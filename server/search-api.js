@@ -2,17 +2,32 @@ var express = require('express');
 
 var app = express();
 
-app.get("/search", function (req, res) {
+let runPy = new Promise(function(success, nosuccess) {
+
     const { spawn } = require('child_process');
-    console.log("starting file");
-    const pyProg = spawn('python', ['./../main.py']);
-    console.log("started");
-    pyProg.stdout.on('data', function(data) {
-        console.log(data.toString());
-        res.write(data);
-        res.end('end');
+    const pyprog = spawn('python', ['./../main.py']);
+
+    pyprog.stdout.on('data', function(data) {
+        success(data);
     });
 
+    pyprog.stderr.on('data', (data) => {
+        nosuccess(data);
+    });
+});
+
+
+app.get("/search", function (req, res) {
+    res.write('welcome\n');
+    runPy.then(function(fromRunpy) {
+        console.log(fromRunpy.toString());
+        res.end(fromRunpy);
+    }).catch(err => {
+        console.error(err);
+      })
+      .then(ok => {
+        console.log(ok.message)
+      });
 });
 
 var server = app.listen(8081, function () {
