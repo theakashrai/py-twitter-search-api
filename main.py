@@ -25,7 +25,9 @@ if response.status_code==200:
 	for data in jsonData['results']:
 		htmlData += "<tr><td><b>" + data["user"]["name"] + "</b></td></tr>"
 		htmlData += "<tr><td>" + data["text"] + "</td></tr>"
-		print(data['entities']['media'])
+		print(data['entities']['media'][0]['media_url'])
+		for image_url in data['entities']['media']:
+			htmlData += "<tr><td><img src='" + image_url['media_url'] + "'></td></tr>"
 		htmlData += "<tr><td><img src='" + "" + "'></td></tr>"
 		htmlData += "<tr><td>" + data["created_at"] + "</td></tr>"
 	htmlData += "</table></body><html>"
